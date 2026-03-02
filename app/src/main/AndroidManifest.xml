@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.internetspeedmeeter">
+
+    <!-- Network and overlay -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Signal strength -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.InternetSpeedMeeter"
+        tools:targetApi="31">
+
+        <!-- LAUNCHER: Splash screen (shown on cold start) -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:noHistory="true"
+            android:theme="@style/Theme.InternetSpeedMeeter">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Main screen (not the launcher anymore) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
+
+        <!-- History screen -->
+        <activity
+            android:name=".HistoryActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+        <!-- Settings screen -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+        <!-- Per-App Data Usage screen -->
+        <activity
+            android:name=".AppDataUsageActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+        <!-- Ping / Latency Monitor -->
+        <activity
+            android:name=".PingActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+        <!-- Data Plan Manager -->
+        <activity
+            android:name=".DataPlanActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+        <!-- ISP Throttle Test -->
+        <activity
+            android:name=".ThrottleTestActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+        <!-- Gaming Mode -->
+        <activity
+            android:name=".GamingModeActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+
+        <!-- Speed monitoring foreground service -->
+        <service
+            android:name=".SpeedService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Live network speed monitoring displayed in status bar notification" />
+        </service>
+
+        <!-- Home Screen Widget -->
+        <receiver
+            android:name=".SpeedWidget"
+            android:exported="true"
+            android:label="Speed Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/speed_widget_info"/>
+        </receiver>
+
+        <!-- FileProvider for CSV/PDF sharing -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.internetspeedmeeter.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths"/>
+        </provider>
+
+    </application>
+
+</manifest>

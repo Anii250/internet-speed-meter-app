@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    app:cardBackgroundColor="@color/card_background_dark"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="14dp">
+
+        <!-- Color dot indicator -->
+        <TextView
+            android:id="@+id/pingItemDot"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:background="@drawable/circle_bg"
+            android:layout_marginEnd="12dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Server name -->
+            <TextView
+                android:id="@+id/pingItemServer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="google.com"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary_dark"/>
+
+            <!-- Server description -->
+            <TextView
+                android:id="@+id/pingItemDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Google DNS"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary_dark"
+                android:layout_marginTop="2dp"/>
+
+        </LinearLayout>
+
+        <!-- Ping value -->
+        <TextView
+            android:id="@+id/pingItemMs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-- ms"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/accent_color"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

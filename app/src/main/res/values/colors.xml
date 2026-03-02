@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ── Premium Brand Palette (Indigo & Slate) ── -->
+    <!-- Primary Brand Colors -->
+    <color name="brand_blue">#6366F1</color>        <!-- Indigo 500 -->
+    <color name="brand_blue_mid">#818CF8</color>    <!-- Indigo 400 -->
+    <color name="brand_blue_light">#EEF2FF</color>  <!-- Indigo 50 -->
+    <color name="brand_blue_pill">#E0E7FF</color>   <!-- Indigo 100 -->
+
+    <!-- Light Theme Backgrounds -->
+    <color name="page_bg">#F8FAFC</color>           <!-- Slate 50 (Crisp Light Background) -->
+    <color name="card_white">#FFFFFF</color>        <!-- Elevated White -->
+    <color name="card_blue">#6366F1</color>         <!-- Indigo 500 content card -->
+    <color name="nav_bg">#FFFFFF</color>            <!-- Clean white nav background -->
+
+    <!-- Dark Theme Backgrounds -->
+    <color name="background_dark">#0F172A</color>        <!-- Slate 900 (Deep Dark Background) -->
+    <color name="card_background_dark">#1E293B</color>   <!-- Slate 800 (Elevated Dark Card) -->
+
+    <!-- Text Colors -->
+    <color name="text_primary">#0F172A</color>           <!-- Slate 900 on Light -->
+    <color name="text_secondary">#64748B</color>         <!-- Slate 500 on Light -->
+    <color name="text_on_blue">#FFFFFF</color>           <!-- White on Indigo -->
+    <color name="text_primary_dark">#F8FAFC</color>      <!-- Slate 50 on Dark -->
+    <color name="text_secondary_dark">#94A3B8</color>    <!-- Slate 400 on Dark -->
+
+    <!-- Semantic Status Colors -->
+    <color name="meter_green">#10B981</color>       <!-- Emerald 500 (Good / Excellent) -->
+    <color name="swatch_green">#10B981</color>
+    <color name="meter_red">#F43F5E</color>         <!-- Rose 500 (Error / Poor) -->
+    <color name="swatch_red">#F43F5E</color>
+    <color name="swatch_yellow">#F59E0B</color>     <!-- Amber 500 (Warning / Average) -->
+    <color name="alert_orange">#F97316</color>      <!-- Orange 500 -->
+
+    <!-- Legacy API matchers (mapped to modern palette) -->
+    <color name="accent_color">#6366F1</color>
+    <color name="nav_indicator">#1A6366F1</color>   <!-- 10% opacity Indigo -->
+    <color name="swatch_cyan">#06B6D4</color>       <!-- Cyan 500 -->
+    <color name="swatch_white">#FFFFFF</color>
+    <color name="swatch_orange">#F97316</color>
+    <color name="swatch_purple">#8B5CF6</color>
+    <color name="swatch_pink">#EC4899</color>
+    <color name="signal_good">#10B981</color>
+    <color name="signal_medium">#F59E0B</color>
+    <color name="signal_weak">#F43F5E</color>
+</resources>

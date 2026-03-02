@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">Internet Speed Meter</string>
+    <string name="notification_channel_name">Speed Monitor</string>
+    <string name="slow_speed_channel_name">Slow Speed Alerts</string>
+    <string name="btn_start">Start</string>
+    <string name="btn_stop">Stop</string>
+    <string name="speed_zero">0 KB/s</string>
+    <string name="upload_zero">↑ 0 KB/s</string>
+    <string name="download_label">↓ Download</string>
+    <string name="upload_label">↑ Upload</string>
+    <string name="change_color_title">Change Status Bar Meter Color:</string>
+    <string name="set_red_button">Red</string>
+    <string name="set_green_button">Green</string>
+    <string name="mobile_data_usage">Mobile: %1$s</string>
+    <string name="wifi_data_usage">Wi-Fi: %1$s</string>
+    <string name="mobile_data_placeholder">Mobile: —</string>
+    <string name="wifi_data_placeholder">Wi-Fi: —</string>
+    <string name="current_download_speed">Current Speed</string>
+    <string name="start_speed_test">Run Speed Test (30s)</string>
+    <string name="speed_test_testing">Testing…</string>
+    <string name="speed_test_error">Speed Test Failed</string>
+    <string name="speed_test_too_fast">Test too fast!</string>
+    <string name="reset_session">Reset</string>
+    <string name="signal_strength">Signal: %1$s</string>
+    <string name="signal_na">Signal: N/A</string>
+    <string name="data_usage_title">Session Data Usage</string>
+    <string name="speed_test_result">%.2f MB/s avg</string>
+    <!-- History screen -->
+    <string name="history_title">Speed Test History</string>
+    <string name="history_empty">No speed tests yet.\nRun your first test from the Home tab!</string>
+    <string name="history_weekly_chart">7-Day Data Usage</string>
+    <string name="history_mobile_legend">■ Mobile</string>
+    <string name="history_wifi_legend">■ Wi-Fi</string>
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_overlay_color">Overlay Text Color</string>
+    <string name="settings_overlay_size">Overlay Text Size</string>
+    <string name="settings_overlay_position">Overlay Position</string>
+    <string name="settings_update_interval">Update Interval</string>
+    <string name="settings_theme">App Theme</string>
+    <string name="settings_slow_alert">Slow Speed Alert</string>
+    <string name="settings_slow_alert_desc">Notify when speed is below threshold</string>
+    <string name="pos_top_right">Top Right</string>
+    <string name="pos_top_left">Top Left</string>
+    <string name="interval_1s">1 second</string>
+    <string name="interval_2s">2 seconds</string>
+    <string name="size_small">Small</string>
+    <string name="size_medium">Medium</string>
+    <string name="size_large">Large</string>
+    <string name="theme_system">Follow System</string>
+    <string name="theme_dark">Always Dark</string>
+    <string name="theme_light">Always Light</string>
+    <string name="alert_off">Off</string>
+    <string name="alert_100kb">Below 100 KB/s</string>
+    <string name="alert_500kb">Below 500 KB/s</string>
+    <string name="alert_1mb">Below 1 MB/s</string>
+    <string name="slow_speed_notif_title">⚠ Slow Internet</string>
+    <string name="slow_speed_notif_text">Speed is below your alert threshold</string>
+    <!-- Accessibility -->
+    <string name="cd_btn_speed_test">Run internet speed test</string>
+    <string name="cd_btn_red">Set overlay color to red</string>
+    <string name="cd_btn_green">Set overlay color to green</string>
+    <string name="cd_btn_reset">Reset session data usage</string>
+    <string name="cd_signal">Current signal strength</string>
+</resources>

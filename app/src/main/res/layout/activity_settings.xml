@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_title"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary_dark"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- ── Overlay Color ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_overlay_color"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary_dark"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:id="@+id/colorGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+            <!-- Color swatches added programmatically -->
+        </LinearLayout>
+
+        <!-- ── Overlay Text Size ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_overlay_size"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary_dark"
+            android:layout_marginBottom="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/rgOverlaySize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <RadioButton android:id="@+id/rbSizeSmall"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/size_small"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbSizeMedium"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/size_medium"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbSizeLarge"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/size_large"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+        </RadioGroup>
+
+        <!-- ── Overlay Position ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_overlay_position"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary_dark"
+            android:layout_marginBottom="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/rgPosition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <RadioButton android:id="@+id/rbPosRight"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/pos_top_right"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbPosLeft"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/pos_top_left"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+        </RadioGroup>
+
+        <!-- ── Update Interval ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_update_interval"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary_dark"
+            android:layout_marginBottom="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/rgInterval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <RadioButton android:id="@+id/rbInterval1s"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/interval_1s"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbInterval2s"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/interval_2s"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+        </RadioGroup>
+
+        <!-- ── App Theme ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_theme"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary_dark"
+            android:layout_marginBottom="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/rgTheme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <RadioButton android:id="@+id/rbThemeSystem"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/theme_system"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbThemeDark"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/theme_dark"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbThemeLight"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/theme_light"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+        </RadioGroup>
+
+        <!-- ── Slow Speed Alert ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_slow_alert"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary_dark"
+            android:layout_marginBottom="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/rgSlowAlert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton android:id="@+id/rbAlertOff"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/alert_off"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbAlert100kb"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/alert_100kb"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbAlert500kb"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/alert_500kb"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+            <RadioButton android:id="@+id/rbAlert1mb"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/alert_1mb"
+                android:textColor="@color/text_primary_dark"
+                android:buttonTint="@color/accent_color"/>
+        </RadioGroup>
+
+    </LinearLayout>
+</ScrollView>

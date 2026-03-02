@@ -1,0 +1,108 @@
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:compileDebugKotlin NO-SOURCE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+
+> Task :app:compileDebugJavaWithJavac FAILED
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:38: error: MainActivity is not abstract and does not override abstract method onTestFatalError(String) in SpeedTestListener
+public class MainActivity extends AppCompatActivity implements SpeedTestListener {
+       ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:410: error: method does not override or implement a method from a supertype
+    @Override public void onFetchServerFailed() {
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:424: error: method does not override or implement a method from a supertype
+    @Override public void onServerSelected(String serverName, String serverCountry,
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:439: error: method does not override or implement a method from a supertype
+    @Override public void onDownloadPercentChanged(int percent, float speedMbs, float avgSpeedMbs) {
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:448: error: method does not override or implement a method from a supertype
+    @Override public void onDownloadTestComplete(float avgSpeedMbs) {
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:458: error: method does not override or implement a method from a supertype
+    @Override public void onUploadPercentChanged(int percent, float speedMbs, float avgSpeedMbs) {
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:464: error: method does not override or implement a method from a supertype
+    @Override public void onUploadTestComplete(float avgSpeedMbs) { /* shown in onTestCompleted */ }
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:466: error: method does not override or implement a method from a supertype
+    @Override public void onTestCompleted(SpeedTestResult result) {
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:478: error: cannot find symbol
+                    dlMBs, ulMBs, result.getPingMs()));
+                                        ^
+  symbol:   method getPingMs()
+  location: variable result of type SpeedTestResult
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:493: error: method does not override or implement a method from a supertype
+    @Override public void onTestError(String errorType, int statusCode, String errorDescription) {
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:500: error: method does not override or implement a method from a supertype
+    @Override public void onPingTestStarted() {}
+    ^
+C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:501: error: method does not override or implement a method from a supertype
+    @Override public void onPingTestComplete(int pingMs, int jitterMs) {
+    ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+12 errors
+
+[Incubating] Problems report is available at: file:///C:/Users/Asus/AndroidStudioProjects/Internetspeedmeeter/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler output below.
+  Note: Recompile with -Xlint:deprecation for details.
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:38: error: MainActivity is not abstract and does not override abstract method onTestFatalError(String) in SpeedTestListener
+  public class MainActivity extends AppCompatActivity implements SpeedTestListener {
+         ^
+  Note: Some input files use or override a deprecated API.
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:410: error: method does not override or implement a method from a supertype
+      @Override public void onFetchServerFailed() {
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:424: error: method does not override or implement a method from a supertype
+      @Override public void onServerSelected(String serverName, String serverCountry,
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:439: error: method does not override or implement a method from a supertype
+      @Override public void onDownloadPercentChanged(int percent, float speedMbs, float avgSpeedMbs) {
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:448: error: method does not override or implement a method from a supertype
+      @Override public void onDownloadTestComplete(float avgSpeedMbs) {
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:458: error: method does not override or implement a method from a supertype
+      @Override public void onUploadPercentChanged(int percent, float speedMbs, float avgSpeedMbs) {
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:464: error: method does not override or implement a method from a supertype
+      @Override public void onUploadTestComplete(float avgSpeedMbs) { /* shown in onTestCompleted */ }
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:466: error: method does not override or implement a method from a supertype
+      @Override public void onTestCompleted(SpeedTestResult result) {
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:493: error: method does not override or implement a method from a supertype
+      @Override public void onTestError(String errorType, int statusCode, String errorDescription) {
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:500: error: method does not override or implement a method from a supertype
+      @Override public void onPingTestStarted() {}
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:501: error: method does not override or implement a method from a supertype
+      @Override public void onPingTestComplete(int pingMs, int jitterMs) {
+      ^
+  C:\Users\Asus\AndroidStudioProjects\Internetspeedmeeter\app\src\main\java\com\example\internetspeedmeeter\MainActivity.java:478: error: cannot find symbol
+                      dlMBs, ulMBs, result.getPingMs()));
+                                          ^
+    symbol:   method getPingMs()
+    location: variable result of type SpeedTestResult
+  12 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 3s
+7 actionable tasks: 1 executed, 6 up-to-date

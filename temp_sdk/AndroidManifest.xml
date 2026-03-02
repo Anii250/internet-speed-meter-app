@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.speedchecker.android.sdk" >
+
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="31" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" /> <!-- FOR WORK MANAGER -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- FOR Firebase Analytics -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
+    <uses-permission android:name="android.permission.READ_BASIC_PHONE_STATE" />
+
+    <application android:usesCleartextTraffic="true" >
+        <service
+            android:name="com.speedchecker.android.sdk.Services.PassiveMeasurementsService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.speedchecker.android.sdk.passive.START_SERVICE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="version"
+                android:value="542" />
+        </service>
+
+        <receiver android:name="com.speedchecker.android.sdk.BroadcastReceivers.GeofenceBroadcastReceiver" />
+        <receiver
+            android:name="com.speedchecker.android.sdk.Workers.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="com.speedchecker.android.action.ALARM" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.speedchecker.android.sdk.BroadcastReceivers.BootReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <!-- For HTC devices -->
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.speedchecker.android.sdk.BroadcastReceivers.UpdateReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

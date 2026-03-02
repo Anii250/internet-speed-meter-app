@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    app:cardBackgroundColor="@color/card_background_dark"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Speed icon column -->
+        <TextView
+            android:id="@+id/itemSpeedIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="⚡"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:background="@drawable/circle_bg"
+            android:layout_marginEnd="12dp"/>
+
+        <!-- Speed and date -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/itemSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00 MB/s"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/accent_color"/>
+
+            <TextView
+                android:id="@+id/itemDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textSize="13sp"
+                android:textColor="@color/text_secondary_dark"/>
+
+        </LinearLayout>
+
+        <!-- Duration badge -->
+        <TextView
+            android:id="@+id/itemDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30s"
+            android:textSize="12sp"
+            android:textColor="@color/background_dark"
+            android:background="@drawable/badge_bg"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

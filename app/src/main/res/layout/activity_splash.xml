@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/splashRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
+
+    <!-- Center block: glow + icon + title + line + tagline -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingBottom="60dp">
+
+        <!-- Glow circle -->
+        <View
+            android:id="@+id/glowCircle"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:background="@drawable/splash_glow"
+            android:alpha="0"/>
+
+        <!-- Lightning bolt icon sits on top of glow via negative margin -->
+        <TextView
+            android:id="@+id/splashIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚡"
+            android:textSize="72sp"
+            android:alpha="0"
+            android:scaleX="0.4"
+            android:scaleY="0.4"
+            android:layout_marginTop="-140dp"/>
+
+        <!-- App name -->
+        <TextView
+            android:id="@+id/splashTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Internet Speed Meter"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary_dark"
+            android:letterSpacing="0.04"
+            android:alpha="0"
+            android:translationY="40dp"
+            android:layout_marginTop="24dp"/>
+
+        <!-- Cyan accent line -->
+        <View
+            android:id="@+id/accentLine"
+            android:layout_width="180dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/accent_color"
+            android:alpha="0"
+            android:scaleX="0"/>
+
+        <!-- Tagline -->
+        <TextView
+            android:id="@+id/splashTagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Real-time Network Monitor"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary_dark"
+            android:letterSpacing="0.08"
+            android:alpha="0"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+    <!-- Developer credit pinned to the bottom -->
+    <TextView
+        android:id="@+id/splashDeveloper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="Developed by Jaiswal jii"
+        android:textSize="13sp"
+        android:textColor="@color/accent_color"
+        android:letterSpacing="0.05"
+        android:alpha="0"
+        android:layout_marginBottom="48dp"/>
+
+</FrameLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected: use brand_blue (overridden to #64B5F6 in night) -->
+    <item android:color="@color/brand_blue" android:state_checked="true"/>
+    <!-- Unselected: grey (overridden to #9BA3C2 in night) -->
+    <item android:color="@color/text_secondary"/>
+</selector>

@@ -1,0 +1,18 @@
+Compiled from "SpeedTestListener.java"
+public interface com.speedchecker.android.sdk.Public.SpeedTestListener {
+  public abstract void onTestStarted();
+  public abstract void onFetchServerFailed(java.lang.Integer);
+  public abstract void onFindingBestServerStarted();
+  public abstract void onTestFinished(com.speedchecker.android.sdk.Public.SpeedTestResult);
+  public abstract void onPingStarted();
+  public abstract void onPingFinished(int, int);
+  public abstract void onDownloadTestStarted();
+  public abstract void onDownloadTestProgress(int, double, double);
+  public abstract void onDownloadTestFinished(double);
+  public abstract void onUploadTestStarted();
+  public abstract void onUploadTestProgress(int, double, double);
+  public abstract void onUploadTestFinished(double);
+  public abstract void onTestWarning(java.lang.String);
+  public abstract void onTestFatalError(java.lang.String);
+  public abstract void onTestInterrupted(java.lang.String);
+}
