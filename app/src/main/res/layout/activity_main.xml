@@ -4,9 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_premium">
+    android:background="#0A0E17"> <!-- Very Dark Blue Background -->
 
-    <!-- ── Scrollable content ── -->
     <ScrollView
         android:id="@+id/scrollContent"
         android:layout_width="0dp"
@@ -31,9 +30,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="20dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="8dp">
+                android:paddingHorizontal="24dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -41,13 +40,14 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
+                    <!-- Back button arrow (mock) if mimicking exact wireframe, otherwise just title -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Internet Speed Meter"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="@color/text_primary"/>
+                        android:textColor="@android:color/white"/>
 
                     <TextView
                         android:id="@+id/signalStrengthView"
@@ -55,517 +55,194 @@
                         android:layout_height="wrap_content"
                         android:text="Detecting…"
                         android:textSize="12sp"
-                        android:textColor="@color/brand_blue"
-                        android:contentDescription="@string/cd_signal"/>
+                        android:textColor="#A0ABC0"
+                        android:layout_marginTop="2dp"/>
 
                 </LinearLayout>
 
-                <!-- Reset button top-right -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnReset"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Reset"
-                    android:textSize="12sp"
-                    android:textColor="@color/brand_blue"
-                    android:contentDescription="@string/cd_btn_reset"
-                    app:strokeColor="@color/brand_blue_light"
-                    app:cornerRadius="20dp"/>
-
+                <ImageButton
+                    android:id="@+id/btnHistory"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    android:tint="#A0ABC0"
+                    android:contentDescription="History" />
             </LinearLayout>
 
             <!-- ──────────────────────────────────────────────────── -->
-            <!--  SPEEDOMETER CARD (white, centered)                   -->
+            <!--  CENTRAL GAUGE                                        -->
             <!-- ──────────────────────────────────────────────────── -->
-            <androidx.cardview.widget.CardView
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginBottom="24dp"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="@color/card_white"
-                app:cardCornerRadius="36dp"
-                app:cardElevation="12dp">
+                android:layout_marginTop="32dp"
+                android:layout_marginHorizontal="24dp"
+                android:clipChildren="false">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="16dp"
-                    android:paddingHorizontal="20dp"
-                    android:gravity="center_horizontal">
+                <!-- The Speedometer View takes up most of the space -->
+                <com.example.internetspeedmeeter.SpeedometerView
+                    android:id="@+id/speedometerView"
+                    android:layout_width="280dp"
+                    android:layout_height="280dp"
+                    android:layout_gravity="center" />
 
-                    <!-- Label -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Speed Test"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginBottom="6dp"/>
-
-                    <!-- Speedometer arc (shown only during test) -->
-                    <com.example.internetspeedmeeter.SpeedometerView
-                        android:id="@+id/speedometerView"
-                        android:layout_width="200dp"
-                        android:layout_height="110dp"
-                        android:layout_gravity="center_horizontal"
-                        android:visibility="gone"/>
-
-                    <!-- Big download speed  -->
-                    <TextView
-                        android:id="@+id/speedTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="↓  0.0 KB/s"
-                        android:textSize="38sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/brand_blue"/>
-
-                    <TextView
-                        android:id="@+id/uploadSpeedView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="↑  0.0 KB/s"
-                        android:textSize="16sp"
-                        android:textColor="@color/meter_green"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="16dp"/>
-
-                    <!-- Progress during test -->
-                    <ProgressBar
-                        android:id="@+id/speedProgressBar"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="4dp"
-                        android:layout_marginBottom="10dp"
-                        android:progressTint="@color/brand_blue"
-                        android:visibility="gone"/>
-
-                    <!-- Run Test button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSpeedTest"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:text="Run Speed Test"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_on_blue"
-                        android:contentDescription="@string/cd_btn_speed_test"
-                        app:backgroundTint="@color/brand_blue"
-                        app:cornerRadius="20dp"/>
-
-                    <TextView
-                        android:id="@+id/speedTestResultView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textColor="@color/brand_blue"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:layout_marginTop="8dp"
-                        android:text=""/>
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Hidden speedtest result card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/speedTestResultCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginBottom="20dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/card_white"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="8dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="14dp"
-                    android:gravity="center"
-                    android:textColor="@color/brand_blue"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:text=""/>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Speedometer card placeholder (compat) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/speedometerCardView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="12dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/card_white"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp">
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"/>
-            </androidx.cardview.widget.CardView>
+            </FrameLayout>
 
             <!-- ──────────────────────────────────────────────────── -->
-            <!--  DOWNLOAD / UPLOAD TILES  (reference: blue + white)   -->
+            <!--  REAL-TIME AND UPLOAD TEXT METRICS                    -->
             <!-- ──────────────────────────────────────────────────── -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="14dp">
-
-                <!-- Download tile (blue) -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="10dp"
-                    app:cardBackgroundColor="@color/brand_blue"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="8dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="6dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="↓"
-                                android:textSize="18sp"
-                                android:textColor="#99FFFFFF"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="  Download"
-                                android:textSize="12sp"
-                                android:textColor="#CCffffff"/>
-                        </LinearLayout>
-                        <TextView
-                            android:id="@+id/mobileDataUsageTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 KB"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_on_blue"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Mobile"
-                            android:textSize="11sp"
-                            android:textColor="#99FFFFFF"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Upload tile (white) -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="2dp"
-                    app:cardBackgroundColor="@color/card_white"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="8dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="6dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="↑"
-                                android:textSize="18sp"
-                                android:textColor="@color/text_secondary"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="  Upload"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_secondary"/>
-                        </LinearLayout>
-                        <TextView
-                            android:id="@+id/wifiDataUsageTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 KB"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_primary"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Wi-Fi"
-                            android:textSize="11sp"
-                            android:textColor="@color/text_secondary"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
-
-            <!-- ──────────────────────────────────────────────────── -->
-            <!--  NETWORK QUALITY (white card, arc)                    -->
-            <!-- ──────────────────────────────────────────────────── -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/card_white"
-                app:cardCornerRadius="32dp"
-                app:cardElevation="8dp">
+                android:paddingHorizontal="40dp"
+                android:layout_marginTop="24dp">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="8dp"
-                    android:paddingHorizontal="20dp"
-                    android:gravity="center_horizontal">
+                    android:gravity="center">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Network Quality"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
+                        android:text="Mobile Rx"
+                        android:textSize="12sp"
+                        android:textColor="#718096"
                         android:layout_marginBottom="4dp"/>
 
-                    <com.example.internetspeedmeeter.NetworkQualityView
-                        android:id="@+id/networkQualityView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
+                    <TextView
+                        android:id="@+id/mobileDataUsageTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 KB"
+                        android:textSize="20sp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"/>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <!-- ──────────────────────────────────────────────────── -->
-            <!--  TOOLS GRID  2 × 3                                    -->
-            <!-- ──────────────────────────────────────────────────── -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tools"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginStart="20dp"
-                android:layout_marginBottom="10dp"/>
-
-            <!-- Row 1 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="10dp">
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardPing"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="88dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="@color/card_white"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="6dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="8dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🏓" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Ping" android:textSize="13sp" android:textStyle="bold"
-                            android:textColor="@color/text_primary" android:layout_marginTop="4dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Latency" android:textSize="10sp" android:textColor="@color/text_secondary"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardAppUsage"
-                    android:layout_width="0dp"
-                    android:layout_height="88dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="@color/card_white"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="6dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="8dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="📊" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="App Usage" android:textSize="13sp" android:textStyle="bold"
-                            android:textColor="@color/text_primary" android:layout_marginTop="4dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Per-App Data" android:textSize="10sp" android:textColor="@color/text_secondary"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Wi-Fi Rx"
+                        android:textSize="12sp"
+                        android:textColor="#718096"
+                        android:layout_marginBottom="4dp"/>
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardDataPlan"
-                    android:layout_width="0dp"
-                    android:layout_height="88dp"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="@color/card_white"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="6dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="8dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="📋" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Data Plan" android:textSize="13sp" android:textStyle="bold"
-                            android:textColor="@color/text_primary" android:layout_marginTop="4dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Monthly Limit" android:textSize="10sp" android:textColor="@color/text_secondary"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:id="@+id/wifiDataUsageTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 KB"
+                        android:textSize="20sp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"/>
+                </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Row 2 -->
+            <!-- Speed Test Controls -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="20dp">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginTop="32dp">
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardThrottle"
-                    android:layout_width="0dp"
-                    android:layout_height="88dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="@color/card_white"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="6dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="8dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🔍" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Throttle" android:textSize="13sp" android:textStyle="bold"
-                            android:textColor="@color/text_primary" android:layout_marginTop="4dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="ISP Detector" android:textSize="10sp" android:textColor="@color/text_secondary"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSpeedTest"
+                    android:layout_width="200dp"
+                    android:layout_height="56dp"
+                    android:text="Run Test"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="#007CFF"
+                    app:cornerRadius="28dp" />
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardGaming"
-                    android:layout_width="0dp"
-                    android:layout_height="88dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="@color/card_white"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="6dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="8dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🎮" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Gaming" android:textSize="13sp" android:textStyle="bold"
-                            android:textColor="@color/text_primary" android:layout_marginTop="4dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Live Ping" android:textSize="10sp" android:textColor="@color/text_secondary"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/speedTestResultView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="12sp"
+                    android:textColor="#00E1D9"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardHistory"
-                    android:layout_width="0dp"
-                    android:layout_height="88dp"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="@color/card_white"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="6dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="8dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="📈" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="History" android:textSize="13sp" android:textStyle="bold"
-                            android:textColor="@color/text_primary" android:layout_marginTop="4dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Tests + Chart" android:textSize="10sp" android:textColor="@color/text_secondary"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+            <!-- ──────────────────────────────────────────────────── -->
+            <!--  WEEKLY USAGE CHART                                   -->
+            <!-- ──────────────────────────────────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="40dp"
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="32dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Weekly usage"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chart"
+                        android:textSize="14sp"
+                        android:textColor="#007CFF"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="4dp"/>
+                </LinearLayout>
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/weeklyUsageChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"/>
 
             </LinearLayout>
+
+            <!-- Hidden Progress Bar for old logic -->
+            <ProgressBar
+                android:id="@+id/speedProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- ── Bottom Navigation (adaptive — dark in both modes) ── -->
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/nav_bg"
+        android:background="#0A0E17"
         app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="@color/nav_item_color"
-        app:itemTextColor="@color/nav_item_color"
+        app:itemIconTint="#718096"
+        app:itemTextColor="#718096"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

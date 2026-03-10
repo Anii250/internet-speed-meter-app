@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.recyclerview)
     // SpeedChecker SDK — accurate speed test with 285+ global servers, up to 1 Gbps
     implementation("com.speedchecker:android-sdk:4.2.299")
+    // MPAndroidChart for beautiful Weekly Usage bar chart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

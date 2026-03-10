@@ -34,6 +34,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements SpeedTestListener {
 
@@ -47,19 +55,19 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
     private static final int    SPEED_TEST_DURATION_MS = 30_000;
 
     // --- Views ---
-    private TextView        downloadSpeedView;
-    private TextView        uploadSpeedView;
+    private TextView        downloadSpeedView; // We'll keep this variable alive but unused for text
+    private TextView        uploadSpeedView;   // keep alive
     private TextView        mobileDataUsageView;
     private TextView        wifiDataUsageView;
     private TextView        signalStrengthView;
     private Button          btnSpeedTest;
-    private Button          btnReset;
     private ProgressBar     speedProgressBar;
     private SpeedometerView speedometerView;
-    private CardView           speedometerCardView;
     private TextView           speedTestResultView;
-    private CardView           speedTestResultCard;
-    private NetworkQualityView networkQualityView;
+    
+    // Chart
+    private BarChart weeklyUsageChart;
+
     // Running ping average for quality score (ms)
     private long lastPingMs = 50;
 
@@ -107,19 +115,21 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
             totalWifiBytes   += wifiDiff;
 
             long rxDiff = mobileDiff + wifiDiff;
+            // We just update the custom gauge view now since the old textviews are removed
             if (!isSpeedTestRunning) {
-                downloadSpeedView.setText("↓ " + SpeedUtils.formatSpeed(rxDiff));
+                // Not running speed test: show live Rx usage on the gauge
+                float combinedMb = rxDiff / (1024f * 1024f); 
+                speedometerView.setTitleText("Live Traffic");
+                speedometerView.setSpeedMb(combinedMb);
             }
-            uploadSpeedView.setText("↑ " + SpeedUtils.formatSpeed(txDiff));
+            // uploadSpeedView.setText("↑ " + SpeedUtils.formatSpeed(txDiff)); // removed from xml
+            
+            // Network Quality Score removed from UI
+            // int qualityScore = computeQualityScore(rxDiff + txDiff, lastPingMs);
+            // networkQualityView.setScore(qualityScore);
 
-            // Update Network Quality Score
-            int qualityScore = computeQualityScore(rxDiff + txDiff, lastPingMs);
-            networkQualityView.setScore(qualityScore);
-
-            mobileDataUsageView.setText(getString(R.string.mobile_data_usage,
-                    SpeedUtils.formatDataUsage(totalMobileBytes)));
-            wifiDataUsageView.setText(getString(R.string.wifi_data_usage,
-                    SpeedUtils.formatDataUsage(totalWifiBytes)));
+            mobileDataUsageView.setText(SpeedUtils.formatDataUsage(totalMobileBytes));
+            wifiDataUsageView.setText(SpeedUtils.formatDataUsage(totalWifiBytes));
 
             lastMobileBytes = curMobile;
             lastWifiBytes   = curWifi;
@@ -162,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
         bindViews();
         setupBottomNav();
         setupButtons();
+        setupChart();
         requestPermissionsAndStartService();
         loadPersistedData();
         startScreenUpdate();
@@ -174,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
         // Always highlight the Home tab when we return to this screen
         BottomNavigationView nav = findViewById(R.id.bottomNav);
         if (nav != null) nav.setSelectedItemId(R.id.nav_home);
+        
+        loadChartData();
     }
 
     @Override
@@ -190,19 +203,100 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
     // =========================================================================
 
     private void bindViews() {
-        downloadSpeedView   = findViewById(R.id.speedTextView);
-        uploadSpeedView     = findViewById(R.id.uploadSpeedView);
         mobileDataUsageView = findViewById(R.id.mobileDataUsageTextView);
         wifiDataUsageView   = findViewById(R.id.wifiDataUsageTextView);
         signalStrengthView  = findViewById(R.id.signalStrengthView);
         btnSpeedTest        = findViewById(R.id.btnSpeedTest);
-        btnReset            = findViewById(R.id.btnReset);
         speedProgressBar    = findViewById(R.id.speedProgressBar);
         speedometerView     = findViewById(R.id.speedometerView);
-        speedometerCardView = findViewById(R.id.speedometerCardView);
         speedTestResultView = findViewById(R.id.speedTestResultView);
-        speedTestResultCard = findViewById(R.id.speedTestResultCard);
-        networkQualityView  = findViewById(R.id.networkQualityView);
+        weeklyUsageChart    = findViewById(R.id.weeklyUsageChart);
+        
+        // Ensure starting state
+        speedometerView.setMaxSpeedMb(150f);
+        speedometerView.setTitleText("Live Traffic");
+        speedometerView.setCountdownText("");
+    }
+
+    // =========================================================================
+    // Bar Chart
+    // =========================================================================
+    
+    private void setupChart() {
+        weeklyUsageChart.getDescription().setEnabled(false);
+        weeklyUsageChart.getLegend().setEnabled(false);
+        weeklyUsageChart.setPinchZoom(false);
+        weeklyUsageChart.setDrawBarShadow(false);
+        weeklyUsageChart.setDrawGridBackground(false);
+        weeklyUsageChart.setTouchEnabled(false);
+
+        XAxis xAxis = weeklyUsageChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setTextColor(android.graphics.Color.parseColor("#718096"));
+        xAxis.setAxisLineColor(android.graphics.Color.parseColor("#152036"));
+        // No static format here; labels are dynamic based on actual data
+        xAxis.setGranularity(1f);
+
+        weeklyUsageChart.getAxisLeft().setDrawGridLines(true);
+        weeklyUsageChart.getAxisLeft().setGridColor(android.graphics.Color.parseColor("#152036"));
+        weeklyUsageChart.getAxisLeft().setTextColor(android.graphics.Color.parseColor("#718096"));
+        weeklyUsageChart.getAxisLeft().setAxisLineColor(android.graphics.Color.TRANSPARENT);
+        weeklyUsageChart.getAxisLeft().setAxisMinimum(0f);
+        weeklyUsageChart.getAxisRight().setEnabled(false);
+
+        loadChartData();
+    }
+
+    private void loadChartData() {
+        executorService.execute(() -> {
+            java.util.List<DailyUsage> recentUsage = AppDatabase.getInstance(MainActivity.this)
+                    .dailyUsageDao().getLast7Days();
+            
+            // Reverse to show oldest to newest (left to right)
+            java.util.Collections.reverse(recentUsage);
+            
+            ArrayList<BarEntry> entries = new ArrayList<>();
+            ArrayList<String> labels = new ArrayList<>();
+            
+            for (int i = 0; i < recentUsage.size(); i++) {
+                DailyUsage u = recentUsage.get(i);
+                float totalMb = (u.mobileBytes + u.wifiBytes) / (1024f * 1024f);
+                entries.add(new BarEntry(i, totalMb));
+                
+                try {
+                    Date date = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(u.dateKey);
+                    String dayStr = new SimpleDateFormat("EEE", Locale.getDefault()).format(date);
+                    labels.add(dayStr);
+                } catch (Exception e) {
+                    labels.add("");
+                }
+            }
+            
+            handler.post(() -> {
+                if (entries.isEmpty()) {
+                    weeklyUsageChart.clear();
+                    return;
+                }
+                
+                BarDataSet dataSet = new BarDataSet(entries, "Weekly Data");
+                
+                int startColor = android.graphics.Color.parseColor("#00E1D9");
+                int endColor = android.graphics.Color.parseColor("#007CFF");
+                dataSet.setGradientColor(startColor, endColor);
+                dataSet.setDrawValues(false); 
+                
+                BarData data = new BarData(dataSet);
+                data.setBarWidth(0.5f);
+                
+                weeklyUsageChart.setData(data);
+                weeklyUsageChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+                weeklyUsageChart.getXAxis().setLabelCount(labels.size());
+                
+                weeklyUsageChart.animateY(1000);
+                weeklyUsageChart.invalidate();
+            });
+        });
     }
 
     // =========================================================================
@@ -217,9 +311,10 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
             if (id == R.id.nav_home) {
                 // Already home — do nothing (scroll to top optional)
                 return true;
-            } else if (id == R.id.nav_history) {
-                startActivity(new Intent(this, HistoryActivity.class));
-                overridePendingTransition(0, 0);
+            } else if (id == R.id.nav_main_menu) {
+                showToolsBottomSheet();
+                // We return false or true? If true it stays selected, let's just make it behave like a button or re-select home
+                nav.post(() -> nav.setSelectedItemId(R.id.nav_home));
                 return true;
             } else if (id == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -236,26 +331,45 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
 
     private void setupButtons() {
         btnSpeedTest.setOnClickListener(v -> runSpeedTest());
-        btnReset.setOnClickListener(v -> resetSession());
-
-        // Feature grid cards
-        rippleCard(R.id.cardPing,      () -> startActivity(new Intent(this, PingActivity.class)));
-        rippleCard(R.id.cardAppUsage,  () -> startActivity(new Intent(this, AppDataUsageActivity.class)));
-        rippleCard(R.id.cardDataPlan,  () -> startActivity(new Intent(this, DataPlanActivity.class)));
-        rippleCard(R.id.cardThrottle,  () -> startActivity(new Intent(this, ThrottleTestActivity.class)));
-        rippleCard(R.id.cardGaming,    () -> startActivity(new Intent(this, GamingModeActivity.class)));
-        rippleCard(R.id.cardHistory,   () -> startActivity(new Intent(this, HistoryActivity.class)));
+        
+        android.view.View btnHistory = findViewById(R.id.btnHistory);
+        if (btnHistory != null) {
+            btnHistory.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
+        }
     }
 
-    /** Adds a click listener + scale animation to a CardView feature tile. */
-    private void rippleCard(int cardId, Runnable action) {
-        android.view.View card = findViewById(cardId);
-        if (card == null) return;
-        card.setOnClickListener(v -> {
-            v.animate().scaleX(0.93f).scaleY(0.93f).setDuration(80).withEndAction(() ->
-                    v.animate().scaleX(1f).scaleY(1f).setDuration(80).withEndAction(action).start()
-            ).start();
+    private void showToolsBottomSheet() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View sheetView = getLayoutInflater().inflate(R.layout.layout_tools_bottom_sheet, null);
+        dialog.setContentView(sheetView);
+
+        // Bind clicks inside bottom sheet
+        sheetView.findViewById(R.id.cardPing).setOnClickListener(v -> {
+            dialog.dismiss();
+            startActivity(new Intent(this, PingActivity.class));
         });
+        sheetView.findViewById(R.id.cardAppUsage).setOnClickListener(v -> {
+            dialog.dismiss();
+            startActivity(new Intent(this, AppDataUsageActivity.class));
+        });
+        sheetView.findViewById(R.id.cardDataPlan).setOnClickListener(v -> {
+            dialog.dismiss();
+            startActivity(new Intent(this, DataPlanActivity.class));
+        });
+        sheetView.findViewById(R.id.cardThrottle).setOnClickListener(v -> {
+            dialog.dismiss();
+            startActivity(new Intent(this, ThrottleTestActivity.class));
+        });
+        sheetView.findViewById(R.id.cardGaming).setOnClickListener(v -> {
+            dialog.dismiss();
+            startActivity(new Intent(this, GamingModeActivity.class));
+        });
+        sheetView.findViewById(R.id.cardSettings).setOnClickListener(v -> {
+            dialog.dismiss();
+            startActivity(new Intent(this, SettingsActivity.class));
+        });
+
+        dialog.show();
     }
 
     // =========================================================================
@@ -293,10 +407,8 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         totalMobileBytes = prefs.getLong(KEY_MOBILE_DATA, 0);
         totalWifiBytes   = prefs.getLong(KEY_WIFI_DATA, 0);
-        mobileDataUsageView.setText(getString(R.string.mobile_data_usage,
-                SpeedUtils.formatDataUsage(totalMobileBytes)));
-        wifiDataUsageView.setText(getString(R.string.wifi_data_usage,
-                SpeedUtils.formatDataUsage(totalWifiBytes)));
+        mobileDataUsageView.setText(SpeedUtils.formatDataUsage(totalMobileBytes));
+        wifiDataUsageView.setText(SpeedUtils.formatDataUsage(totalWifiBytes));
     }
 
     private void persistDataUsage() {
@@ -314,8 +426,8 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
         totalMobileBytes = 0;
         totalWifiBytes   = 0;
         persistDataUsage();
-        mobileDataUsageView.setText(getString(R.string.mobile_data_usage, "0 KB"));
-        wifiDataUsageView.setText(getString(R.string.wifi_data_usage, "0 KB"));
+        mobileDataUsageView.setText("0 KB");
+        wifiDataUsageView.setText("0 KB");
     }
 
     // =========================================================================
@@ -387,13 +499,12 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
         isSpeedTestRunning = true;
 
         btnSpeedTest.setEnabled(false);
-        downloadSpeedView.setText(getString(R.string.speed_test_testing));
-        speedometerCardView.setVisibility(View.VISIBLE);
-        speedTestResultCard.setVisibility(View.GONE);
+        speedTestResultView.setText("");
         speedProgressBar.setVisibility(View.VISIBLE);
         speedProgressBar.setProgress(0);
         speedometerView.setMaxSpeedMb(600f);
         speedometerView.setSpeedMbImmediate(0f);
+        speedometerView.setTitleText("Testing");
         speedometerView.setCountdownText("…");
 
         // SDK picks the nearest server automatically and runs the full test
@@ -409,14 +520,14 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
 
     @Override public void onFetchServerFailed(Integer serverId) {
         handler.post(() -> {
-            downloadSpeedView.setText("⚠️ No server found");
+            speedometerView.setTitleText("No Server");
             onSpeedTestFinished();
         });
     }
 
     @Override public void onFindingBestServerStarted() {
         handler.post(() -> {
-            downloadSpeedView.setText("Finding best server…");
+            speedometerView.setTitleText("Finding Server");
             speedometerView.setCountdownText("↗");
         });
     }
@@ -429,13 +540,10 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
             speedometerView.setSpeedMb(dlMBs);
             speedProgressBar.setProgress(100);
 
-            downloadSpeedView.setText(String.format(Locale.getDefault(),
-                    "↓ %.2f MB/s", dlMBs));
             int ping = result.getPing() != null ? result.getPing() : 0;
             speedTestResultView.setText(String.format(Locale.getDefault(),
                     "↓ %.2f MB/s   ↑ %.2f MB/s   Ping %d ms",
                     dlMBs, ulMBs, ping));
-            speedTestResultCard.setVisibility(View.VISIBLE);
 
             // Save to Room DB
             executorService.execute(() -> {
@@ -454,13 +562,13 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
     @Override public void onPingFinished(int ping, int jitter) {
         handler.post(() -> {
             lastPingMs = ping;
-            downloadSpeedView.setText("Server Ping: " + ping + " ms");
+            speedTestResultView.setText("Ping: " + ping + " ms");
         });
     }
 
     @Override public void onDownloadTestStarted() {
         handler.post(() -> {
-            downloadSpeedView.setText("Downloading…");
+            speedometerView.setTitleText("Download");
             speedometerView.setCountdownText("↓");
         });
     }
@@ -469,16 +577,14 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
         handler.post(() -> {
             speedProgressBar.setProgress(percent / 2); // download = first 50% of bar
             speedometerView.setSpeedMb((float) speedMbs);
-            downloadSpeedView.setText(String.format(Locale.getDefault(),
-                    "↓ %.1f MB/s  (avg %.1f)", speedMbs, avgSpeedMbs));
         });
     }
 
     @Override public void onDownloadTestFinished(double avgSpeedMbs) {
         handler.post(() -> {
+            speedometerView.setTitleText("Upload");
             speedometerView.setCountdownText("↑");
-            downloadSpeedView.setText(String.format(Locale.getDefault(),
-                    "↓ %.2f MB/s ✓  Testing upload…", avgSpeedMbs));
+            speedometerView.setSpeedMbImmediate(0f);
         });
     }
 
@@ -488,8 +594,6 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
         handler.post(() -> {
             speedProgressBar.setProgress(50 + percent / 2); // upload = last 50% of bar
             speedometerView.setSpeedMb((float) speedMbs);
-            downloadSpeedView.setText(String.format(Locale.getDefault(),
-                    "↑ %.1f MB/s  (avg %.1f)", speedMbs, avgSpeedMbs));
         });
     }
 
@@ -499,14 +603,14 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
 
     @Override public void onTestFatalError(String error) {
         handler.post(() -> {
-            downloadSpeedView.setText("Test error: " + error);
+            speedometerView.setTitleText("Test Error");
             onSpeedTestFinished();
         });
     }
 
     @Override public void onTestInterrupted(String reason) {
         handler.post(() -> {
-            downloadSpeedView.setText("Test interrupted: " + reason);
+            speedometerView.setTitleText("Interrupted");
             onSpeedTestFinished();
         });
     }
@@ -518,7 +622,6 @@ public class MainActivity extends AppCompatActivity implements SpeedTestListener
         btnSpeedTest.setEnabled(true);
         speedProgressBar.setVisibility(View.GONE);
         speedometerView.setCountdownText("");
-        handler.postDelayed(() -> speedometerCardView.setVisibility(View.GONE), 4_000L);
     }
 
     // =========================================================================

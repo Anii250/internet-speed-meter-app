@@ -2,6 +2,7 @@ package com.example.internetspeedmeeter;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,14 +11,23 @@ import android.widget.Switch;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.app.AppOpsManager;
+import android.app.usage.NetworkStats;
+import android.app.usage.NetworkStatsManager;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.net.TrafficStats;
+import android.net.ConnectivityManager;
+import android.os.RemoteException;
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,16 +58,7 @@ public class AppDataUsageActivity extends AppCompatActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
 
         // Initial load
-        executor.execute(() -> {
-            List<AppDataUsageAdapter.AppEntry> entries = loadAppUsage();
-            runOnUiThread(() -> {
-                loading.setVisibility(View.GONE);
-                rv.setVisibility(View.VISIBLE);
-                adapter = new AppDataUsageAdapter(entries);
-                adapter.setOnRestrictClickListener(pkg -> openDataRestriction(pkg));
-                rv.setAdapter(adapter);
-            });
-        });
+        checkAndLoadAppUsage(rv, loading);
 
         if (liveSwitch != null) {
             liveSwitch.setOnCheckedChangeListener((btn, checked) -> {
@@ -95,6 +96,58 @@ public class AppDataUsageActivity extends AppCompatActivity {
         executor.shutdown();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // If coming back from settings, attempt to reload if we now have permission
+        if (hasUsageStatsPermission()) {
+            RecyclerView rv = findViewById(R.id.appUsageRecyclerView);
+            ProgressBar loading = findViewById(R.id.appUsageLoading);
+            if (adapter == null) {
+                checkAndLoadAppUsage(rv, loading);
+            }
+        }
+    }
+
+    private boolean hasUsageStatsPermission() {
+        AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+        int mode;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            mode = appOps.unsafeCheckOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(), getPackageName());
+        } else {
+            mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(), getPackageName());
+        }
+        return mode == AppOpsManager.MODE_ALLOWED;
+    }
+
+    private void requestUsageStatsPermission() {
+        startActivity(new Intent(android.provider.Settings.ACTION_USAGE_ACCESS_SETTINGS));
+    }
+
+    private void checkAndLoadAppUsage(RecyclerView rv, ProgressBar loading) {
+        if (!hasUsageStatsPermission()) {
+            requestUsageStatsPermission();
+            loading.setVisibility(View.GONE);
+            return;
+        }
+
+        loading.setVisibility(View.VISIBLE);
+        rv.setVisibility(View.GONE);
+
+        executor.execute(() -> {
+            List<AppDataUsageAdapter.AppEntry> entries = loadAppUsage();
+            runOnUiThread(() -> {
+                loading.setVisibility(View.GONE);
+                rv.setVisibility(View.VISIBLE);
+                adapter = new AppDataUsageAdapter(entries);
+                adapter.setOnRestrictClickListener(pkg -> openDataRestriction(pkg));
+                rv.setAdapter(adapter);
+            });
+        });
+    }
+
     private List<AppDataUsageAdapter.AppEntry> loadAppUsage() {
         return buildEntries(false);
     }
@@ -104,30 +157,80 @@ public class AppDataUsageActivity extends AppCompatActivity {
     }
 
     private List<AppDataUsageAdapter.AppEntry> buildEntries(boolean live) {
+        if (!hasUsageStatsPermission()) return new ArrayList<>();
+
         PackageManager pm = getPackageManager();
         List<ApplicationInfo> apps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         List<AppDataUsageAdapter.AppEntry> raw = new ArrayList<>();
 
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) getSystemService(Context.NETWORK_STATS_SERVICE);
+        if (networkStatsManager == null) return raw;
+
+        // Get stats for the current month
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        long startTime = calendar.getTimeInMillis();
+        long endTime = System.currentTimeMillis();
+
+        Map<Integer, Long[]> uidStats = new HashMap<>();
+
+        try {
+            // Mobile Data
+            NetworkStats mobileStats = networkStatsManager.querySummary(ConnectivityManager.TYPE_MOBILE, null, startTime, endTime);
+            NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+            while (mobileStats.hasNextBucket()) {
+                mobileStats.getNextBucket(bucket);
+                int uid = bucket.getUid();
+                long rx = bucket.getRxBytes();
+                long tx = bucket.getTxBytes();
+                Long[] stats = uidStats.getOrDefault(uid, new Long[]{0L, 0L});
+                stats[0] += rx;
+                stats[1] += tx;
+                uidStats.put(uid, stats);
+            }
+            mobileStats.close();
+
+            // WiFi Data
+            NetworkStats wifiStats = networkStatsManager.querySummary(ConnectivityManager.TYPE_WIFI, null, startTime, endTime);
+            while (wifiStats.hasNextBucket()) {
+                wifiStats.getNextBucket(bucket);
+                int uid = bucket.getUid();
+                long rx = bucket.getRxBytes();
+                long tx = bucket.getTxBytes();
+                Long[] stats = uidStats.getOrDefault(uid, new Long[]{0L, 0L});
+                stats[0] += rx;
+                stats[1] += tx;
+                uidStats.put(uid, stats);
+            }
+            wifiStats.close();
+        } catch (RemoteException | SecurityException e) {
+            Log.e("AppDataUsageActivity", "Failed to query network stats", e);
+            return raw;
+        }
+
         for (ApplicationInfo info : apps) {
-            int   uid      = info.uid;
-            long  rxBytes  = TrafficStats.getUidRxBytes(uid);
-            long  txBytes  = TrafficStats.getUidTxBytes(uid);
+            int uid = info.uid;
+            Long[] stats = uidStats.get(uid);
+
+            long rxBytes = (stats != null) ? stats[0] : 0;
+            long txBytes = (stats != null) ? stats[1] : 0;
 
             if (rxBytes <= 0 && txBytes <= 0) continue;
-            if (rxBytes == TrafficStats.UNSUPPORTED
-                    || txBytes == TrafficStats.UNSUPPORTED) continue;
 
             String appName;
             android.graphics.drawable.Drawable icon;
             try {
                 appName = pm.getApplicationLabel(info).toString();
-                icon    = pm.getApplicationIcon(info.packageName);
+                icon = pm.getApplicationIcon(info.packageName);
             } catch (PackageManager.NameNotFoundException e) {
                 appName = info.packageName;
-                icon    = null;
+                icon = null;
             }
 
-            // Live delta
+            // Live delta check
             boolean activeNow = false;
             if (live) {
                 Long prev = prevRxMap.get(uid);
@@ -148,7 +251,7 @@ public class AppDataUsageActivity extends AppCompatActivity {
         long maxBytes = raw.isEmpty() ? 1L : raw.get(0).totalBytes();
         List<AppDataUsageAdapter.AppEntry> result = new ArrayList<>();
         for (AppDataUsageAdapter.AppEntry e : raw) {
-            int pct = (int)(e.totalBytes() * 100L / maxBytes);
+            int pct = (int) (e.totalBytes() * 100L / maxBytes);
             result.add(new AppDataUsageAdapter.AppEntry(
                     e.packageName, e.appName, e.icon,
                     e.rxBytes, e.txBytes, pct, e.activeNow));

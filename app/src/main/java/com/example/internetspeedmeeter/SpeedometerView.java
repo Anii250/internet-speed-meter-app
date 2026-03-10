@@ -3,75 +3,107 @@ package com.example.internetspeedmeeter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
+
 import androidx.core.content.ContextCompat;
+
 import java.util.Locale;
 
 /**
- * A speedometer gauge that shows current speed with an animated needle.
- * 0 is on the left, max speed on the right (semicircle).
+ * A sleek, neon-glowing circular speedometer gauge.
+ * Starts at the bottom (-225 degrees) and sweeps clockwise to the other side.
  */
 public class SpeedometerView extends View {
 
     private static final float DEFAULT_MAX_SPEED_MB = 150f;
-    private static final int NEEDLE_ANIM_DURATION_MS = 280;
+    private static final int NEEDLE_ANIM_DURATION_MS = 350;
 
-    private final Paint arcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint needlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    // Track (background arc)
+    private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    // Progress (glowing arc)
+    private final Paint progressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
     private final RectF arcRect = new RectF();
 
     private float maxSpeedMb = DEFAULT_MAX_SPEED_MB;
     private float currentSpeedMb = 0f;
-    private float currentAngleDeg = 180f;  // 0 speed = left (180°)
+    
+    // Angles for a full 270-degree sweeping arc
+    private static final float START_ANGLE = 135f; 
+    private static final float MAX_SWEEP_ANGLE = 270f;
+    
+    private float currentSweepAngle = 0f;
     private ValueAnimator needleAnimator;
-    private String countdownText = ""; // e.g. "28s"
+    
+    private String titleText = "Download";
+    private String subtitleText = "MB/s"; // e.g., "MB/s"
+    private String countdownText = ""; // e.g., "28s"
 
-    private int arcColor;
-    private int needleColor;
-    private int textColor;
+    private final Paint titlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint speedTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint subtitlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint countdownPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // Gradients
+    private int[] gradientColors;
 
     public SpeedometerView(Context context) {
         super(context);
-        init(context);
+        init();
     }
 
     public SpeedometerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init();
     }
 
     public SpeedometerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
 
-    private void init(Context context) {
-        arcColor = ContextCompat.getColor(context, R.color.text_secondary_dark);
-        needleColor = ContextCompat.getColor(context, R.color.accent_color);
-        textColor = ContextCompat.getColor(context, R.color.text_primary_dark);
+    private void init() {
+        // Deep blue track
+        trackPaint.setStyle(Paint.Style.STROKE);
+        trackPaint.setStrokeWidth(dp(16));
+        trackPaint.setColor(Color.parseColor("#152036")); // Dark track color
+        trackPaint.setStrokeCap(Paint.Cap.ROUND);
 
-        arcPaint.setStyle(Paint.Style.STROKE);
-        arcPaint.setStrokeWidth(dp(8));
-        arcPaint.setColor(arcColor);
+        // Neon glowing progress
+        progressPaint.setStyle(Paint.Style.STROKE);
+        progressPaint.setStrokeWidth(dp(16));
+        progressPaint.setStrokeCap(Paint.Cap.ROUND);
+        // We will set the shader in onSizeChanged when we know the bounds
 
-        needlePaint.setStyle(Paint.Style.STROKE);
-        needlePaint.setStrokeWidth(dp(4));
-        needlePaint.setColor(needleColor);
-        needlePaint.setStrokeCap(Paint.Cap.ROUND);
+        gradientColors = new int[]{
+                Color.parseColor("#00E1D9"), // Cyan
+                Color.parseColor("#007CFF"), // Blue
+                Color.parseColor("#9D00FF"), // Purple
+                Color.parseColor("#FF007A")  // Pink
+        };
 
-        textPaint.setColor(textColor);
-        textPaint.setTextSize(sp(18));
-        textPaint.setTextAlign(Paint.Align.CENTER);
+        titlePaint.setColor(Color.parseColor("#A0ABC0")); // Light gray
+        titlePaint.setTextSize(sp(14));
+        titlePaint.setTextAlign(Paint.Align.CENTER);
 
-        countdownPaint.setColor(textColor);
-        countdownPaint.setTextSize(sp(28));
+        speedTextPaint.setColor(Color.WHITE);
+        speedTextPaint.setTextSize(sp(48));
+        speedTextPaint.setTextAlign(Paint.Align.CENTER);
+        speedTextPaint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.SANS_SERIF, android.graphics.Typeface.BOLD));
+
+        subtitlePaint.setColor(Color.parseColor("#718096")); // Darker gray
+        subtitlePaint.setTextSize(sp(12));
+        subtitlePaint.setTextAlign(Paint.Align.CENTER);
+
+        countdownPaint.setColor(Color.parseColor("#A0ABC0"));
+        countdownPaint.setTextSize(sp(14));
         countdownPaint.setTextAlign(Paint.Align.CENTER);
-        countdownPaint.setAlpha(180);
     }
 
     private float dp(float dp) {
@@ -82,58 +114,58 @@ public class SpeedometerView extends View {
         return sp * getResources().getDisplayMetrics().scaledDensity;
     }
 
-    /** Set max speed (MB/s) for the scale. Needle will not go beyond this. */
     public void setMaxSpeedMb(float maxSpeedMb) {
         this.maxSpeedMb = Math.max(0.1f, maxSpeedMb);
     }
 
-    /** Sets the countdown text drawn in the center of the gauge (e.g. "28s"). Pass empty string to clear. */
     public void setCountdownText(String text) {
         this.countdownText = text == null ? "" : text;
         invalidate();
     }
+    
+    public void setTitleText(String text) {
+        this.titleText = text == null ? "" : text;
+        invalidate();
+    }
 
-    /**
-     * Set current speed (MB/s). Needle animates smoothly to the new value.
-     */
     public void setSpeedMb(float speedMb) {
         float clamped = Math.max(0, Math.min(speedMb, maxSpeedMb));
         if (needleAnimator != null && needleAnimator.isRunning()) {
             needleAnimator.cancel();
         }
-        float endAngle = speedToAngle(clamped);
+        float endSweep = speedToSweepAngle(clamped);
         currentSpeedMb = clamped;
+        
         int w = getWidth();
         int h = getHeight();
         if (w > 0 && h > 0) {
-            float startAngle = currentAngleDeg;
-            needleAnimator = ValueAnimator.ofFloat(startAngle, endAngle);
+            float startSweep = currentSweepAngle;
+            needleAnimator = ValueAnimator.ofFloat(startSweep, endSweep);
             needleAnimator.setDuration(NEEDLE_ANIM_DURATION_MS);
+            needleAnimator.setInterpolator(new DecelerateInterpolator());
             needleAnimator.addUpdateListener(animation -> {
-                currentAngleDeg = (float) animation.getAnimatedValue();
+                currentSweepAngle = (float) animation.getAnimatedValue();
                 invalidate();
             });
             needleAnimator.start();
         } else {
-            currentAngleDeg = endAngle;
+            currentSweepAngle = endSweep;
         }
         invalidate();
     }
 
-    /** Set speed without animation (e.g. reset to 0). */
     public void setSpeedMbImmediate(float speedMb) {
         if (needleAnimator != null && needleAnimator.isRunning()) {
             needleAnimator.cancel();
         }
         currentSpeedMb = Math.max(0, Math.min(speedMb, maxSpeedMb));
-        currentAngleDeg = speedToAngle(currentSpeedMb);
+        currentSweepAngle = speedToSweepAngle(currentSpeedMb);
         invalidate();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        // Cancel running animator to prevent memory/resource leak
         if (needleAnimator != null && needleAnimator.isRunning()) {
             needleAnimator.cancel();
         }
@@ -142,13 +174,28 @@ public class SpeedometerView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        if (w > 0 && h > 0) invalidate();
+        if (w > 0 && h > 0) {
+            // Setup gradient when size changes
+            float cx = w / 2f;
+            float cy = h / 2f;
+            // A sweep gradient centered in the view
+            SweepGradient sweepGradient = new SweepGradient(cx, cy, gradientColors, null);
+            // Rotate the gradient to align with our start angle
+            android.graphics.Matrix matrix = new android.graphics.Matrix();
+            matrix.preRotate(START_ANGLE, cx, cy);
+            sweepGradient.setLocalMatrix(matrix);
+            progressPaint.setShader(sweepGradient);
+            
+            // Add a subtle drop shadow to the progress paint for the "neon" effect
+            progressPaint.setShadowLayer(dp(8), 0, 0, Color.parseColor("#88007CFF"));
+            
+            invalidate();
+        }
     }
 
-    private float speedToAngle(float speedMb) {
-        // 0 MB/s -> 180° (left), maxSpeed -> 0° (right)
+    private float speedToSweepAngle(float speedMb) {
         float t = maxSpeedMb > 0 ? (speedMb / maxSpeedMb) : 0;
-        return 180f - t * 180f;
+        return t * MAX_SWEEP_ANGLE;
     }
 
     @Override
@@ -158,37 +205,38 @@ public class SpeedometerView extends View {
         int h = getHeight();
         if (w <= 0 || h <= 0) return;
 
-        float padding = dp(24);
+        float padding = dp(20); // Make room for stroke width and shadow
         float radius = Math.min(w, h) / 2f - padding;
         float cx = w / 2f;
         float cy = h / 2f;
 
         arcRect.set(cx - radius, cy - radius, cx + radius, cy + radius);
-        // Draw bottom semicircle: start at 180°, sweep 180°
-        canvas.drawArc(arcRect, 180f, 180f, false, arcPaint);
+        
+        // 1. Draw the background track
+        canvas.drawArc(arcRect, START_ANGLE, MAX_SWEEP_ANGLE, false, trackPaint);
 
-        // Optional: draw a filled arc for "progress" (0 to current speed)
-        // Skip for a cleaner needle-only look
+        // 2. Draw the glowing progress arc
+        if (currentSweepAngle > 0.01f) {
+            canvas.drawArc(arcRect, START_ANGLE, currentSweepAngle, false, progressPaint);
+        }
 
-        // Needle: from center to edge at currentAngleDeg
-        double rad = Math.toRadians(currentAngleDeg);
-        float needleLen = radius - dp(12);
-        float nx = (float) (cx + needleLen * Math.cos(rad));
-        float ny = (float) (cy + needleLen * Math.sin(rad));
-        canvas.drawLine(cx, cy, nx, ny, needlePaint);
-
-        // Speed text below the gauge — clamp so it never draws outside the view
+        // 3. Draw Inner Text
+        // Title (e.g. "Download")
+        canvas.drawText(titleText, cx, cy - dp(32), titlePaint);
+        
+        // Speed Value (e.g. "2800")
         String speedStr = currentSpeedMb >= 0.01f
-                ? String.format(Locale.getDefault(), "%.2f MB/s", currentSpeedMb)
-                : "0 MB/s";
-        float textY = cy + radius + dp(28);
-        float maxTextY = h - dp(4);
-        if (textY > maxTextY) textY = maxTextY;
-        canvas.drawText(speedStr, cx, textY, textPaint);
+                ? String.format(Locale.getDefault(), "%.1f", currentSpeedMb)
+                : "0";
+        // Slightly lower the y offset to horizontally center the large text visually
+        canvas.drawText(speedStr, cx, cy + dp(12), speedTextPaint);
+        
+        // Subtitle (e.g. "MB/s")
+        canvas.drawText(subtitleText, cx, cy + dp(38), subtitlePaint);
 
-        // Countdown text in the center of the gauge
+        // Countdown or extra info (e.g., "Finding server...")
         if (!countdownText.isEmpty()) {
-            canvas.drawText(countdownText, cx, cy + dp(8), countdownPaint);
+            canvas.drawText(countdownText, cx, cy + dp(60), countdownPaint);
         }
     }
 }

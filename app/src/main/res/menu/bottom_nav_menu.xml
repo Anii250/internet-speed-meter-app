@@ -7,9 +7,9 @@
         android:title="Home"/>
 
     <item
-        android:id="@+id/nav_history"
-        android:icon="@android:drawable/ic_menu_recent_history"
-        android:title="History"/>
+        android:id="@+id/nav_main_menu"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Main Menu"/>
 
     <item
         android:id="@+id/nav_settings"
